@@ -14,6 +14,10 @@ firebase.initializeApp(config);
 
 var database = firebase.database();
 
+// To hold user's auth information
+var email = "";
+var password = "";
+
 // firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
 //   // Handle Errors here.
 //   var errorCode = error.code;
@@ -28,24 +32,58 @@ var database = firebase.database();
 //   // ...
 // });
 
-// FirebaseUI config.
-var uiConfig = {
-  // TODO: update to production URL
-  signInSuccessUrl: 'main.html',
-  signInOptions: [
-    // Leave the lines as is for the providers you want to offer your users.
-    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-    firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-    firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-    firebase.auth.GithubAuthProvider.PROVIDER_ID,
-    firebase.auth.EmailAuthProvider.PROVIDER_ID,
-    firebase.auth.PhoneAuthProvider.PROVIDER_ID
-  ],
-  // Terms of service url.
-  tosUrl: '<your-tos-url>'
-};
+var sampleUser = {
+  userName: "foo",
+  choice: "",
+  totalWins: 0,
+  totalLosses: 0
+}
 
-// Initialize the FirebaseUI Widget using Firebase.
-var ui = new firebaseui.auth.AuthUI(firebase.auth());
-// The start method will wait until the DOM is loaded.
-ui.start('#firebaseui-auth-container', uiConfig);
+// How to handle chat history:
+// Make it a property of the user object?
+// Or its own (top-level) object, maybe an array (for ordering) full of objects, each with only one key-value pair ({userName: "message"})?
+// the latter.
+
+// What happens on logout? Chat history persists for still-connected user. If a new player2 comes along, though, they shouldn't see history.
+// and maybe at that point it's reset for player1 as well?
+// on "new game" between both existing players, though, chat should persist
+
+$("#signIn").submit(function (e) { 
+  e.preventDefault();
+  email = $("#email").val();
+  password = $("#password").val();
+  firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+    // Handle Errors here.
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    console.log("Error", errorCode, ":", errorMessage);
+    if (errorCode === "auth/user-not-found") {
+      firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log("Error", errorCode, ":", errorMessage);
+        // ...
+      });
+    }
+    // ...
+  });
+});
+
+firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    // User is signed in.
+    console.log("user:", user);
+    var displayName = user.displayName;
+    var email = user.email;
+    var emailVerified = user.emailVerified;
+    var photoURL = user.photoURL;
+    var isAnonymous = user.isAnonymous;
+    var uid = user.uid;
+    var providerData = user.providerData;
+    // ...
+  } else {
+    // User is signed out.
+    // ...
+  }
+});

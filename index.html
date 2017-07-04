@@ -14,16 +14,47 @@
     <link href="assets/style.css" rel="stylesheet">
   </head>
   <body>
-
-    <div id="login">
-      
-    </div>
-
-    <div id="output">
-      
-    </div>
+<div class="container">
   
+      <div id="login">
+        
+      </div>
+  
+      <div id="output">
+        
+      </div>
+  
+      <form id="signIn">
+        <div class="row">
+          <div class="input-field col s12">
+            <input id="email" type="email" class="validate" required>
+            <label for="email">Email</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <input id="password" type="password" class="validate" autocomplete="current-password" minlength="6" maxlength="12" required>
+            <label for="password">Password</label>
+          </div>
+        </div>
+        <button class="btn waves-effect waves-light" type="submit" name="action">play
+          <i class="fa fa-gamepad" aria-hidden="true"></i>
+        </button>
+      </form>
+  
+    <!-- "sign in" modal - save for later -->
+    <!--<div class="modal">
+      <div class="modal-content">
+        <h4>Modal Header</h4>
+        <p>A bunch of text</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Play</a>
+      </div>
+    </div>
+    -->
 
+</div>  
   <!--link Firebase-->
   <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
   <!--link jQuery-->
