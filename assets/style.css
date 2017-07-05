@@ -23,6 +23,11 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0 5px;
 }
 
+.smaller {
+  font-size: smaller;
+  margin-top: 5px;
+}
+
 .toast {
   display: block;
 }

@@ -153,7 +153,28 @@ $("#create-user").click(function (e) {
 
 // create new user
 function createNewUser() {
-  // build input form, id #createNew
+  // build input form, id #create-new  
+  $("#splashModal").html(`
+    <div class="modal-content">
+      <form id="create-new">
+        <div class="row">
+          <div class="input-field col s12">
+            <input id="email" type="email" class="validate" required>
+            <label for="email">Email</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <input id="password" type="password" class="validate" autocomplete="current-password" minlength="6" maxlength="12" required>
+            <label for="password">Password</label>
+          </div>
+        </div>
+        <button class="btn waves-effect orange" type="submit" name="action">play
+          <i class="fa fa-gamepad" aria-hidden="true"></i>
+        </button>
+      </form>
+    </div>
+  `);
   // firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
   //   // Handle Errors here.
   //   var errorCode = error.code;
@@ -163,7 +184,7 @@ function createNewUser() {
   // });
 }
 
-$(document).on("submit", "#createNew", function (e) {
+$(document).on("submit", "#create-new", function (e) {
   e.preventDefault();
   
 });
