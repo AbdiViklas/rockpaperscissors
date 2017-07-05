@@ -1,5 +1,5 @@
 // specify globals for the benefit of ESLint
-/* global $, firebase */
+/* global $, firebase, Materialize */
 
 // Initialize Firebase
 var config = {
@@ -36,9 +36,11 @@ var playersPresent = 0;
 //   // ...
 // });
 
+// TODO: delete. just here to help me visualize the needed properties
 var sampleUser = {
   displayName: "foo",
   photoURL: "",
+  conected: false, //?
   choice: "",
   totalWins: 0,
   totalLosses: 0
@@ -53,26 +55,117 @@ var sampleUser = {
 // and maybe at that point it's reset for player1 as well?
 // on "new game" between both existing players, though, chat should persist
 
-$("#signIn").submit(function (e) { 
+// USER AUTH
+
+// open the sign-in modal--Materialize takes care of watching for DOM ready:
+$('#splashModal').modal('open');
+
+// sign in with Google
+$("#google-auth").click(function (e) { 
   e.preventDefault();
-  email = $("#email").val();
-  password = $("#password").val();
-  firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+  var provider = new firebase.auth.GoogleAuthProvider();
+  // send the user off on a redirect to Google sign in
+  firebase.auth().signInWithRedirect(provider);
+  // handle what happens when they get back
+  firebase.auth().getRedirectResult().then(function(result) {
+    if (result.credential) {
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      var token = result.credential.accessToken;
+      // ...
+    }
+    // close the sign-in modal
+    $("#splashModal").modal('close');
+    // The signed-in user info.
+    var user = result.user;
+  }).catch(function(error) {
     // Handle Errors here.
     var errorCode = error.code;
     var errorMessage = error.message;
-    console.log("Error", errorCode, ":", errorMessage);
-    if (errorCode === "auth/user-not-found") {
-      firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.log("Error", errorCode, ":", errorMessage);
-        // ...
-      });
-    }
-    // ...
+    // The email of the user's account used.
+    var email = error.email;
+    // The firebase.auth.AuthCredential type that was used.
+    var credential = error.credential;
+    var errorToastTxt = `
+      <h3>I'm sorry, there's been a problem!</h3>
+      <p>Error code "${errorCode}," when logging in with ${email} via ${credential}: ${errorMessage}.</p>
+      <a class="btn waves-effect orange">OK</a>
+    `;
+    Materialize.toast(errorToastTxt);
   });
+});
+
+// display form to sign in as existing user
+$("#existing-user").click(function (e) {
+  e.preventDefault();
+  $("#splashModal").html(`
+    <div class="modal-content">
+      <form id="signIn">
+        <div class="row">
+          <div class="input-field col s12">
+            <input id="email" type="email" class="validate" required>
+            <label for="email">Email</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <input id="password" type="password" class="validate" autocomplete="current-password" minlength="6" maxlength="12" required>
+            <label for="password">Password</label>
+          </div>
+        </div>
+        <button class="btn waves-effect orange" type="submit" name="action">play
+          <i class="fa fa-gamepad" aria-hidden="true"></i>
+        </button>
+      </form>
+    </div>
+  `);
+});
+
+// sign in with existing email/password
+$(document).on("submit", "#signIn", function (e) {
+  e.preventDefault();
+  console.log("submitted");
+  email = $("#email").val();
+  password = $("#password").val();
+  // TODO: create success promise
+  firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+    // Handle Errors here.
+    console.log("error");
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    if (errorCode === "auth/user-not-found") {
+      createNewUser();
+    } else {
+    var errorToastTxt = `
+      <h3>I'm sorry, there's been a problem!</h3>
+      <p>Error code "${errorCode}": ${errorMessage}.</p>
+      <a class="btn waves-effect orange">OK</a>
+    `;
+    Materialize.toast(errorToastTxt);
+    }
+  });
+});
+
+// display form to create new user
+$("#create-user").click(function (e) { 
+  e.preventDefault();
+  createNewUser();
+});
+
+// create new user
+function createNewUser() {
+  // build input form, id #createNew
+  // firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+  //   // Handle Errors here.
+  //   var errorCode = error.code;
+  //   var errorMessage = error.message;
+  //   console.log("Error", errorCode, ":", errorMessage);
+  //   // ...
+  // });
+}
+
+$(document).on("submit", "#createNew", function (e) {
+  e.preventDefault();
+  
 });
 
 firebase.auth().onAuthStateChanged(function(user) {
@@ -83,7 +176,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     var email = user.email;
     var emailVerified = user.emailVerified;
     var photoURL = user.photoURL;
-    var isAnonymous = user.isAnonymous;
+    var isAnonymous = user.isAnonymous; //?
     var uid = user.uid;
     var providerData = user.providerData;
     // ...
@@ -93,14 +186,19 @@ firebase.auth().onAuthStateChanged(function(user) {
   }
 });
 
+// Make Materialize toasts dismissible with click
+$(document).on("click", ".toast", function () {
+  $(this).fadeOut(function(){
+    $(this).remove();
+  });
+});
+
 // A little check that the Google button isn't overflowing and truncating
 $(document).ready(function(){
+  // TODO: delete testing toast
+  // Materialize.toast(`<p>test</p><a class="btn orange waves-effect">OK</a>`);
   var googleAuth = document.getElementById("google-auth");
-  console.log(googleAuth);
   if (googleAuth.scrollHeight > googleAuth.clientHeight) {
-    console.log("yes");
     googleAuth.style.padding = "0 1rem";
   }
 });
-// open the sign-in modal--Materialize takes care of watching for DOM ready:
-$('#splashModal').modal('open');
