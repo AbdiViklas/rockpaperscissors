@@ -34,7 +34,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .toast-btn {
-  margin: 5px 0;
+  margin: 5px 0 !important;
 }
 
 /* To use images as radio buttons */

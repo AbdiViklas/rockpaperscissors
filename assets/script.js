@@ -22,20 +22,6 @@ var photoURL = "";
 // increment to 1 or 2 on player connect
 var playersPresent = 0;
 
-// firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
-//   // Handle Errors here.
-//   var errorCode = error.code;
-//   var errorMessage = error.message;
-//   // ...
-// });
-
-// firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
-//   // Handle Errors here.
-//   var errorCode = error.code;
-//   var errorMessage = error.message;
-//   // ...
-// });
-
 // TODO: delete. just here to help me visualize the needed properties
 var sampleUser = {
   displayName: "foo",
@@ -58,7 +44,7 @@ var sampleUser = {
 // USER AUTH
 
 // initialize splashModal, with option to make it non-dismissible
-// TODO: why doesn't this work? modal is still dismissible
+  // TODO: why doesn't this work? modal is still dismissible
 $('.modal').modal({
   dismissible: false
 });
@@ -66,8 +52,10 @@ $('.modal').modal({
 // open the sign-in modal--Materialize takes care of watching for DOM ready:
 $('#splashModal').modal('open');
 
+var initialModalContent = $("#splashModal").html();
+
 // sign in with Google
-$("#google-auth").click(function (e) { 
+$(document).on("click", "#google-auth", function (e) { 
   e.preventDefault();
   var provider = new firebase.auth.GoogleAuthProvider();
   // send the user off on a redirect to Google sign in
@@ -101,7 +89,7 @@ $("#google-auth").click(function (e) {
 });
 
 // display form to sign in as existing user
-$("#existing-user").click(function (e) {
+$(document).on("click", "#existing-user", function (e) {
   e.preventDefault();
   $("#splashModal").html(`
     <div class="modal-content">
@@ -118,12 +106,21 @@ $("#existing-user").click(function (e) {
             <label for="password">Password</label>
           </div>
         </div>
-        <button class="btn waves-effect orange" type="submit" name="action">play
+        <button class="btn waves-effect orange" type="submit" name="action">
           <i class="fa fa-gamepad" aria-hidden="true"></i>
+          play 
+        </button>
+        <button class="btn back-btn waves-effect orange">
+          <i class="fa fa-arrow-left" aria-hidden="true"></i>
+          back
         </button>
       </form>
     </div>
   `);
+});
+
+$(document).on("click", ".back-btn", function () {
+  $("#splashModal").html(initialModalContent);
 });
 
 // sign in with existing email/password
@@ -141,8 +138,8 @@ $(document).on("submit", "#signIn", function (e) {
       Materialize.toast(`
         <h3>Who?</h3>
         <p>We don't recognize that combo of email and password.</p>
-        <p>Want to create a <a class="waves-effect btn toast-btn orange" onclick="createNewUser()"><i class="fa fa-user-plus left" aria-hidden="true"></i>New user</a>?</p>
-        <p>Or just <a class="waves-effect btn toast-btn orange">try again</a>?
+        <p>Want to create a <a class="waves-effect btn toast-btn orange" onclick="createNewUser()"><i class="fa fa-user-plus left" aria-hidden="true"></i>New user</a> ?</p>
+        <p>Or just <a class="waves-effect btn toast-btn orange">try again</a> ?
       `);
     } else {
     var errorToastTxt = `
@@ -156,7 +153,7 @@ $(document).on("submit", "#signIn", function (e) {
 });
 
 // On click "new user",
-$("#create-user").click(function (e) { 
+$(document).on("click", "#create-user", function (e) {
   e.preventDefault();
   // form-building is separated into its own function so it can also get called by an unsuccessful attempt to log in as existing user
   createNewUser();
@@ -226,8 +223,13 @@ function createNewUser() {
             </label>
           </div>
         </div>
-        <button class="btn waves-effect orange" type="submit" name="action">play
+        <button class="btn waves-effect orange" type="submit" name="action">
           <i class="fa fa-gamepad" aria-hidden="true"></i>
+          play
+        </button>
+        <button class="btn back-btn waves-effect orange">
+          <i class="fa fa-arrow-left" aria-hidden="true"></i>
+          back
         </button>
       </form>
     </div>
