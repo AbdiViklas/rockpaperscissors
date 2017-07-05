@@ -234,18 +234,33 @@ function createNewUser() {
       </form>
     </div>
   `);
-  // firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
-  //   // Handle Errors here.
-  //   var errorCode = error.code;
-  //   var errorMessage = error.message;
-  //   console.log("Error", errorCode, ":", errorMessage);
-  //   // ...
-  // });
+
 }
 
 $(document).on("submit", "#create-new", function (e) {
   e.preventDefault();
-  
+  email = $("#email").val();
+  password = $("#password").val();
+  firebase.auth().createUserWithEmailAndPassword(email, password).then(function(user){
+    if (user) {
+      console.log("logged in:", user);
+    } else {
+      console.log("no user");
+    }
+
+    // close the sign-in modal
+    $("#splashModal").modal('close');
+  }).catch(function(error) {
+  // Handle Errors here.
+  var errorCode = error.code;
+  var errorMessage = error.message;
+  var errorToastTxt = `
+      <h3>I'm sorry, there's been a problem!</h3>
+      <p>Error code "${errorCode}": ${errorMessage}.</p>
+      <a class="btn waves-effect orange">OK</a>
+    `;
+    Materialize.toast(errorToastTxt);
+  });
 });
 
 firebase.auth().onAuthStateChanged(function(user) {
