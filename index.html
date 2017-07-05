@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="assets/reset.css">
     <!--Import FontAwesome icons-->
     <script src="https://use.fontawesome.com/ec64bfb6ac.js"></script>
+    <!--Import Google font-->
+    <link href="https://fonts.googleapis.com/css?family=Audiowide" rel="stylesheet">
     <!-- link Materialize CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.99.0/css/materialize.min.css">
     <!-- link own css -->
@@ -15,44 +17,52 @@
   </head>
   <body>
 <div class="container">
-  
-      <div id="login">
-        
-      </div>
-  
-      <div id="output">
-        
-      </div>
-  
-      <form id="signIn">
-        <div class="row">
-          <div class="input-field col s12">
-            <input id="email" type="email" class="validate" required>
-            <label for="email">Email</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <input id="password" type="password" class="validate" autocomplete="current-password" minlength="6" maxlength="12" required>
-            <label for="password">Password</label>
-          </div>
-        </div>
-        <button class="btn waves-effect waves-light" type="submit" name="action">play
-          <i class="fa fa-gamepad" aria-hidden="true"></i>
-        </button>
-      </form>
-  
-    <!-- "sign in" modal - save for later -->
-    <!--<div class="modal">
-      <div class="modal-content">
-        <h4>Modal Header</h4>
-        <p>A bunch of text</p>
-      </div>
-      <div class="modal-footer">
-        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Play</a>
+
+  <div id="login">
+    
+  </div>
+
+  <div id="output">
+    
+  </div>
+
+  <form id="signIn">
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="email" type="email" class="validate" required>
+        <label for="email">Email</label>
       </div>
     </div>
-    -->
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="password" type="password" class="validate" autocomplete="current-password" minlength="6" maxlength="12" required>
+        <label for="password">Password</label>
+      </div>
+    </div>
+    <button class="btn waves-effect waves-light" type="submit" name="action">play
+      <i class="fa fa-gamepad" aria-hidden="true"></i>
+    </button>
+  </form>
+  
+  <!--move this into the initial modal offering login choices-->
+
+
+  <!--modal, open on load, offering choices of create, sign in, or use Google-->
+  <div id="splashModal" class="modal">
+    <div class="modal-content">
+      <h4 class="flow-text center">Welcome to RockPaperScissors!</h4>
+      <div class="auth-btn-container">
+        <a id="google-auth" class="waves-effect btn auth-btn white black-text"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="auth-icon left"></img>Sign in with Google</a>
+        <p class="flow-text">...or use your own login:</p>
+        <a id="create-user" class="waves-effect btn auth-btn orange"><i class="fa fa-user-plus left" aria-hidden="true"></i>New user</a>
+        <a id="existing-user" class="waves-effect btn auth-btn orange"><i class="fa fa-user left" aria-hidden="true"></i>Existing user</a>
+      </div>
+    </div>
+    <!--<div class="modal-footer">
+      <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Play</a>
+    </div>-->
+  </div>
+
 
 </div>  
   <!--link Firebase-->

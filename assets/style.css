@@ -1,0 +1,24 @@
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Audiowide', cursive;
+}
+
+#google-auth {
+  text-transform: none;
+}
+
+.auth-btn-container {
+  max-width: 360px;
+  margin: auto;
+}
+
+.auth-btn {
+  display: inline-block;
+  width: 100%;
+  margin: 5px 10px;
+}
+
+.auth-icon {
+  height: 100%;
+  width: 18px;
+  margin: 0 5px;
+}

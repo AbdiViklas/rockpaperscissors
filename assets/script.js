@@ -15,8 +15,12 @@ firebase.initializeApp(config);
 var database = firebase.database();
 
 // To hold user's auth information
+var displayName = "";
 var email = "";
 var password = "";
+var photoURL = "";
+// increment to 1 or 2 on player connect
+var playersPresent = 0;
 
 // firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
 //   // Handle Errors here.
@@ -33,7 +37,8 @@ var password = "";
 // });
 
 var sampleUser = {
-  userName: "foo",
+  displayName: "foo",
+  photoURL: "",
   choice: "",
   totalWins: 0,
   totalLosses: 0
@@ -87,3 +92,15 @@ firebase.auth().onAuthStateChanged(function(user) {
     // ...
   }
 });
+
+// A little check that the Google button isn't overflowing and truncating
+$(document).ready(function(){
+  var googleAuth = document.getElementById("google-auth");
+  console.log(googleAuth);
+  if (googleAuth.scrollHeight > googleAuth.clientHeight) {
+    console.log("yes");
+    googleAuth.style.padding = "0 1rem";
+  }
+});
+// open the sign-in modal--Materialize takes care of watching for DOM ready:
+$('#splashModal').modal('open');
