@@ -54,6 +54,47 @@ $('#splashModal').modal('open');
 
 var initialModalContent = $("#splashModal").html();
 
+// success and error handlers for after sign in
+function assignUser(user) {
+  if (user) {
+    // User is signed in.
+    $("#splashModal").modal('close');
+    console.log("user:", user);
+    displayName = user.displayName;
+    email = user.email;
+    photoURL = user.photoURL;
+    // var emailVerified = user.emailVerified;
+    // var isAnonymous = user.isAnonymous; //?
+    // var uid = user.uid;
+    // var providerData = user.providerData;
+  } else {
+    // User is signed out.
+    console.log("no user");
+    $("#splashModal").html(initialModalContent);
+    $('#splashModal').modal('open');
+  }
+}
+
+function handleAuthError(error) {
+  var errorCode = error.code;
+  var errorMessage = error.message;
+  if (errorCode === "auth/user-not-found") {
+    Materialize.toast(`
+      <h3>Who?</h3>
+      <p>We don't recognize that combo of email and password.</p>
+      <p>Want to create a <a class="waves-effect btn toast-btn orange" onclick="createNewUser()"><i class="fa fa-user-plus left" aria-hidden="true"></i>New user</a> ?</p>
+      <p>Or just <a class="waves-effect btn toast-btn orange">try again</a> ?
+    `);
+  } else {
+  var errorToastTxt = `
+    <h3>I'm sorry, there's been a problem!</h3>
+    <p>Error code "${errorCode}": ${errorMessage}.</p>
+    <a class="btn waves-effect orange">OK</a>
+  `;
+  Materialize.toast(errorToastTxt);
+  }
+}
+
 // sign in with Google
 $(document).on("click", "#google-auth", function (e) { 
   e.preventDefault();
@@ -61,31 +102,9 @@ $(document).on("click", "#google-auth", function (e) {
   // send the user off on a redirect to Google sign in
   firebase.auth().signInWithRedirect(provider);
   // handle what happens when they get back
-  firebase.auth().getRedirectResult().then(function(result) {
-    if (result.credential) {
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      var token = result.credential.accessToken;
-      // ...
-    }
-    // close the sign-in modal
-    $("#splashModal").modal('close');
-    // The signed-in user info.
-    var user = result.user;
-  }).catch(function(error) {
-    // Handle Errors here.
-    var errorCode = error.code;
-    var errorMessage = error.message;
-    // The email of the user's account used.
-    var email = error.email;
-    // The firebase.auth.AuthCredential type that was used.
-    var credential = error.credential;
-    var errorToastTxt = `
-      <h3>I'm sorry, there's been a problem!</h3>
-      <p>Error code "${errorCode}," when logging in with ${email} via ${credential}: ${errorMessage}.</p>
-      <a class="btn waves-effect orange">OK</a>
-    `;
-    Materialize.toast(errorToastTxt);
-  });
+  firebase.auth().getRedirectResult()
+  .then(assignUser)
+  .catch(handleAuthError);
 });
 
 // display form to sign in as existing user
@@ -130,26 +149,9 @@ $(document).on("submit", "#signIn", function (e) {
   email = $("#email").val();
   password = $("#password").val();
   // TODO: create success promise
-  firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
-    // Handle Errors here.
-    var errorCode = error.code;
-    var errorMessage = error.message;
-    if (errorCode === "auth/user-not-found") {
-      Materialize.toast(`
-        <h3>Who?</h3>
-        <p>We don't recognize that combo of email and password.</p>
-        <p>Want to create a <a class="waves-effect btn toast-btn orange" onclick="createNewUser()"><i class="fa fa-user-plus left" aria-hidden="true"></i>New user</a> ?</p>
-        <p>Or just <a class="waves-effect btn toast-btn orange">try again</a> ?
-      `);
-    } else {
-    var errorToastTxt = `
-      <h3>I'm sorry, there's been a problem!</h3>
-      <p>Error code "${errorCode}": ${errorMessage}.</p>
-      <a class="btn waves-effect orange">OK</a>
-    `;
-    Materialize.toast(errorToastTxt);
-    }
-  });
+  firebase.auth().signInWithEmailAndPassword(email, password)
+  .then(assignUser)
+  .catch(handleAuthError);
 });
 
 // On click "new user",
@@ -237,49 +239,30 @@ function createNewUser() {
 
 }
 
+// sign in as new user
 $(document).on("submit", "#create-new", function (e) {
   e.preventDefault();
   email = $("#email").val();
   password = $("#password").val();
-  firebase.auth().createUserWithEmailAndPassword(email, password).then(function(user){
-    if (user) {
-      console.log("logged in:", user);
-    } else {
-      console.log("no user");
-    }
+  firebase.auth().createUserWithEmailAndPassword(email, password)
+  .then(assignUser)
+  .catch(handleAuthError);
+});
 
-    // close the sign-in modal
-    $("#splashModal").modal('close');
+
+firebase.auth().onAuthStateChanged(assignUser);
+
+// 
+$(document).on("click", "#sign-out", function (e) {
+  e.preventDefault();
+  firebase.auth().signOut().then(function() {
+    // Sign-out successful.
   }).catch(function(error) {
-  // Handle Errors here.
-  var errorCode = error.code;
-  var errorMessage = error.message;
-  var errorToastTxt = `
-      <h3>I'm sorry, there's been a problem!</h3>
-      <p>Error code "${errorCode}": ${errorMessage}.</p>
-      <a class="btn waves-effect orange">OK</a>
-    `;
-    Materialize.toast(errorToastTxt);
+    // An error happened.
   });
 });
 
-firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
-    // User is signed in.
-    console.log("user:", user);
-    var displayName = user.displayName;
-    var email = user.email;
-    var emailVerified = user.emailVerified;
-    var photoURL = user.photoURL;
-    var isAnonymous = user.isAnonymous; //?
-    var uid = user.uid;
-    var providerData = user.providerData;
-    // ...
-  } else {
-    // User is signed out.
-    // ...
-  }
-});
+// UI BEHAVIOR
 
 // Make Materialize toasts dismissible with click
 $(document).on("click", ".toast", function () {

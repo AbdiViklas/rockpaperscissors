@@ -2,6 +2,14 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Audiowide', cursive;
 }
 
+body {
+  background-color: #f5f5f5;
+}
+
+.brand-logo {
+  margin-left: 1vw;
+}
+
 #google-auth {
   text-transform: none;
 }
@@ -47,4 +55,13 @@ label > input + img{ /* IMAGE STYLES */
 }
 label > input:checked + img{ /* (RADIO CHECKED) IMAGE STYLES */
   box-shadow: 0 0 20px 10px orange;
+}
+
+#messages {
+  min-height: 20vh;
+}
+
+.gray-box {
+  border: 5px solid #9e9e9e;
+  border-radius: 10px;
 }
