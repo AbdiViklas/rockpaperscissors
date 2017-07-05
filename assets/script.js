@@ -49,9 +49,6 @@ $('.modal').modal({
   dismissible: false
 });
 
-// open the sign-in modal--Materialize takes care of watching for DOM ready:
-$('#splashModal').modal('open');
-
 var initialModalContent = $("#splashModal").html();
 
 // success and error handlers for after sign in
@@ -67,6 +64,7 @@ function assignUser(user) {
     // var isAnonymous = user.isAnonymous; //?
     // var uid = user.uid;
     // var providerData = user.providerData;
+    glowOrange($("#messages"), "Welcome " + displayName + "!");
   } else {
     // User is signed out.
     console.log("no user");
@@ -280,3 +278,17 @@ $(document).ready(function(){
     googleAuth.style.padding = "0 1rem";
   }
 });
+
+function glowOrange(target, string) {
+  console.log(string);
+  var newDiv = $("<div class='glow-orange'>");
+  newDiv.text(string);
+  target.append(newDiv);
+  // use CSS transitions to bring an orange text-shadow in and out
+  setTimeout(function() {
+    newDiv.addClass("glowing");
+  }, 250);
+  setTimeout(function() {
+    newDiv.removeClass("glowing");
+  }, 3000);
+}
