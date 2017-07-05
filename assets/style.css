@@ -30,4 +30,21 @@ h1, h2, h3, h4, h5, h6 {
 
 .toast {
   display: block;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.toast-btn {
+  margin: 5px 0;
+}
+
+/* To use images as radio buttons */
+label > input{ /* HIDE RADIO */
+  visibility: hidden; /* Makes input not-clickable */
+  position: absolute; /* Remove input from document flow */
+}
+label > input + img{ /* IMAGE STYLES */
+  cursor:pointer;
+}
+label > input:checked + img{ /* (RADIO CHECKED) IMAGE STYLES */
+  box-shadow: 0 0 20px 10px orange;
 }

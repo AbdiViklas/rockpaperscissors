@@ -57,6 +57,12 @@ var sampleUser = {
 
 // USER AUTH
 
+// initialize splashModal, with option to make it non-dismissible
+// TODO: why doesn't this work? modal is still dismissible
+$('.modal').modal({
+  dismissible: false
+});
+
 // open the sign-in modal--Materialize takes care of watching for DOM ready:
 $('#splashModal').modal('open');
 
@@ -129,11 +135,15 @@ $(document).on("submit", "#signIn", function (e) {
   // TODO: create success promise
   firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
     // Handle Errors here.
-    console.log("error");
     var errorCode = error.code;
     var errorMessage = error.message;
     if (errorCode === "auth/user-not-found") {
-      createNewUser();
+      Materialize.toast(`
+        <h3>Who?</h3>
+        <p>We don't recognize that combo of email and password.</p>
+        <p>Want to create a <a class="waves-effect btn toast-btn orange" onclick="createNewUser()"><i class="fa fa-user-plus left" aria-hidden="true"></i>New user</a>?</p>
+        <p>Or just <a class="waves-effect btn toast-btn orange">try again</a>?
+      `);
     } else {
     var errorToastTxt = `
       <h3>I'm sorry, there's been a problem!</h3>
@@ -145,18 +155,25 @@ $(document).on("submit", "#signIn", function (e) {
   });
 });
 
-// display form to create new user
+// On click "new user",
 $("#create-user").click(function (e) { 
   e.preventDefault();
+  // form-building is separated into its own function so it can also get called by an unsuccessful attempt to log in as existing user
   createNewUser();
 });
 
-// create new user
+// display form to create new user
 function createNewUser() {
   // build input form, id #create-new  
   $("#splashModal").html(`
     <div class="modal-content">
       <form id="create-new">
+        <div class="row">
+          <div class="input-field col s12">
+            <input id="name" type="text" class="validate" required>
+            <label for="name">Name</label>
+          </div>
+        </div>
         <div class="row">
           <div class="input-field col s12">
             <input id="email" type="email" class="validate" required>
@@ -167,6 +184,46 @@ function createNewUser() {
           <div class="input-field col s12">
             <input id="password" type="password" class="validate" autocomplete="current-password" minlength="6" maxlength="12" required>
             <label for="password">Password</label>
+          </div>
+        </div>
+        <!--icon picker-->
+        <div class="row">
+          <p>Pick a photo to represent you:</p>
+          <div class="col s4 m2">
+            <label>
+              <input type="radio" name="icon" id="star" />
+              <img class="responsive-img circle" src="assets/images/star.jpg">
+            </label>
+          </div>
+          <div class="col s4 m2">
+            <label>
+              <input type="radio" name="icon" id="ball" />
+              <img class="responsive-img circle" src="assets/images/ball.jpg">
+            </label>
+          </div>
+          <div class="col s4 m2">
+            <label>
+              <input type="radio" name="icon" id="cat" />
+              <img class="responsive-img circle" src="assets/images/cat.jpg">
+            </label>
+          </div>
+          <div class="col s4 m2">
+            <label>
+              <input type="radio" name="icon" id="chess" />
+              <img class="responsive-img circle" src="assets/images/chess.jpg">
+            </label>
+          </div>
+          <div class="col s4 m2">
+            <label>
+              <input type="radio" name="icon" id="dog" />
+              <img class="responsive-img circle" src="assets/images/dog.jpg">
+            </label>
+          </div>
+          <div class="col s4 m2">
+            <label>
+              <input type="radio" name="icon" id="fish" />
+              <img class="responsive-img circle" src="assets/images/fish.jpg">
+            </label>
           </div>
         </div>
         <button class="btn waves-effect orange" type="submit" name="action">play
