@@ -56,19 +56,26 @@ function logInOut() {
     // var providerData = user.providerData;
     $("#messages").empty();
     glowOrange($("#messages"), `<img src="${currentUser.photoURL}" class="user-pic img-responsive circle">Welcome ${currentUser.displayName}!`);
-
+    // update firebase with the order in which players have arrived
     database.ref("players").once("value").then(function(snapshot){
-      var currentVal = snapshot.val();
+      var players = snapshot.val();
       // If you're the first one here...
-      if (currentVal.player1 === "") {
+      if (players.player1 === "") {
         database.ref("players/player1").set(currentUser.displayName);
         playerNum = "player1";
-      } else if (currentVal.player2 === "") { // if you're the second one here...
+        setTimeout(function() {
+          glowOrange($("#messages"), "Now waiting for Player 2...");
+        }, 1000);
+      } else if (players.player2 === "") { // if you're the second one here...
         database.ref("players/player2").set(currentUser.displayName);
         playerNum = "player2";
+        setTimeout(function() {
+          glowOrange($("#messages"), players.player1 + " is already waiting for you!");
+        }, 1000);
+      } else {
+        glowOrange($("#messages"), `Sorry, ${players.player1} is playing ${players.player2} right now. Wait for one of them to sign out.`)
       }
     });
-
   } else if (!user) {
     // User is signed out.
     console.log("no user");
@@ -78,7 +85,25 @@ function logInOut() {
   }
 }
 
-
+database.ref("players").on("value", function(snapshot){
+  var change = snapshot.val();
+  console.log(change);
+  if (playerNum === undefined) {
+    return; // Meaning this is the initial call of this function, on page load, before playerNum has had a chance to be set
+  } else if (playerNum = "player1" && change.player2 !== "") {
+    // idea: the above means "I'm logged in, and somebody else is too"
+    // flip a bool to reflect that two players have engaged
+    // after that if either is "" it means someone has logged out
+    // possible changes:
+    // x player1 logs in (calling this before setting)
+    // x player1 sets value to his name
+      // x Who cares? taken care of above
+    // x player2 logs in (calling this before setting)
+    // player2 sets value to her name
+      // alert player1 that player2 has arrived
+    // player 1 or player 2 logs out
+  }
+});
 
 function handleAuthError(error) {
   var errorCode = error.code;
