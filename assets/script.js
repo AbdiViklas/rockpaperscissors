@@ -14,7 +14,7 @@ firebase.initializeApp(config);
 
 var database = firebase.database();
 
-var displayName, email, password, photoURL, playerNum;
+var displayName, email, password, photoURL, playerNum, choice;
 
 var signedIn = false;
 
@@ -342,3 +342,11 @@ function glowOrange(target, string) {
     newDiv.removeClass("glowing");
   }, 3000);
 }
+
+// GAMEPLAY
+
+$(".hand-box").click(function (e) { 
+  e.preventDefault();
+  $(".hand-box").not($(this)).removeClass("choice");
+  $(this).addClass("choice");
+});
