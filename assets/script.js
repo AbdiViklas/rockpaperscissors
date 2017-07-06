@@ -16,6 +16,8 @@ var database = firebase.database();
 
 var displayName, email, password, photoURL, playerNum;
 
+var signedIn = false;
+
 // To hold user's display information
 var currentUser = {
   displayName: "",
@@ -63,12 +65,16 @@ function logInOut() {
       if (players.player1 === "") {
         database.ref("players/player1").set(currentUser.displayName);
         playerNum = "player1";
+        signedIn = true;
+        // a little timeout just for the appearance of it
         setTimeout(function() {
           glowOrange($("#messages"), "Now waiting for Player 2...");
         }, 1000);
       } else if (players.player2 === "") { // if you're the second one here...
         database.ref("players/player2").set(currentUser.displayName);
         playerNum = "player2";
+        signedIn = true;
+        // a little timeout just for the appearance of it
         setTimeout(function() {
           glowOrange($("#messages"), players.player1 + " is already waiting for you!");
         }, 1000);
@@ -85,23 +91,17 @@ function logInOut() {
   }
 }
 
-database.ref("players").on("value", function(snapshot){
+database.ref("players").on("child_changed", function(snapshot){
   var change = snapshot.val();
   console.log(change);
   if (playerNum === undefined) {
-    return; // Meaning this is the initial call of this function, on page load, before playerNum has had a chance to be set
-  } else if (playerNum = "player1" && change.player2 !== "") {
-    // idea: the above means "I'm logged in, and somebody else is too"
-    // flip a bool to reflect that two players have engaged
-    // after that if either is "" it means someone has logged out
-    // possible changes:
-    // x player1 logs in (calling this before setting)
-    // x player1 sets value to his name
-      // x Who cares? taken care of above
-    // x player2 logs in (calling this before setting)
-    // player2 sets value to her name
-      // alert player1 that player2 has arrived
-    // player 1 or player 2 logs out
+    return; 
+    // Meaning this is the initial call of this function, on page load, before playerNum has had a chance to be set
+  } else if (signedIn && change === "") {
+    // Meaning "I'm signed in, but the other player isn't"
+    glowOrange($("#messages"), "Oops, the other player has signed out. Um, you win by default, I guess?");
+  } else if (change !== currentUser.displayName) {
+    glowOrange($("#messages"), change + " has arrived!");
   }
 });
 
@@ -296,6 +296,8 @@ firebase.auth().onAuthStateChanged(logInOut);
 // 
 $(document).on("click", "#sign-out", function (e) {
   e.preventDefault();
+  // first, negate signedIn so the child_added listener on the database "players" node can distinguish between this signout and the initial absence of users
+  signedIn = false;
   // return firebase player designation to empty string (you can't have a key with no value) and local var playerNum to undefined
   database.ref("players/" + playerNum).set("").then(function(){
     playerNum = undefined;
