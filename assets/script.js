@@ -14,11 +14,11 @@ firebase.initializeApp(config);
 
 var database = firebase.database();
 
-// To hold user's auth information
+var displayName, email, password, photoURL;
+
+// To hold user's display information
 var currentUser = {
   displayName: "",
-  email: "",
-  password: "",
   photoURL: ""
 }
 // increment to 1 or 2 on player connect
@@ -54,12 +54,14 @@ $('.modal').modal({
 var initialModalContent = $("#splashModal").html();
 
 // success and error handlers for after sign in
-function assignUser(user) {
+function assignUser() {
+  var user = firebase.auth().currentUser;
+    console.log("assignUser received:", user); // the object logged here has displayName set correctly
   if (user) {
-    // User is signed in.
+    // User is signed in
     $("#splashModal").modal('close');
-    console.log("assignUser received:", user);
     currentUser.displayName = user.displayName;
+    // the two lines below log null
     console.log("user.displayName:", user.displayName);
     console.log("currentUser.displayName", currentUser.displayName);
     currentUser.email = user.email;
@@ -69,10 +71,11 @@ function assignUser(user) {
     // var uid = user.uid;
     // var providerData = user.providerData;
     $("#messages").empty();
-    glowOrange($("#messages"), "Welcome " + currentUser.displayName + "!");
-  } else {
+    glowOrange($("#messages"), `<img src="${currentUser.photoURL}" class="user-pic img-responsive circle">Welcome ${currentUser.displayName}!`);
+  } else if (!user) {
     // User is signed out.
     console.log("no user");
+    $("#messages").empty();
     $("#splashModal").html(initialModalContent);
     $('#splashModal').modal('open');
   }
@@ -193,37 +196,37 @@ function createNewUser() {
           <p>Pick a photo to represent you:</p>
           <div class="col s4 m2">
             <label>
-              <input type="radio" name="icon" val="star" />
+              <input type="radio" name="icon" id="star" />
               <img class="responsive-img circle" src="assets/images/star.jpg">
             </label>
           </div>
           <div class="col s4 m2">
             <label>
-              <input type="radio" name="icon" val="ball" />
+              <input type="radio" name="icon" id="ball" />
               <img class="responsive-img circle" src="assets/images/ball.jpg">
             </label>
           </div>
           <div class="col s4 m2">
             <label>
-              <input type="radio" name="icon" val="cat" />
+              <input type="radio" name="icon" id="cat" />
               <img class="responsive-img circle" src="assets/images/cat.jpg">
             </label>
           </div>
           <div class="col s4 m2">
             <label>
-              <input type="radio" name="icon" val="chess" />
+              <input type="radio" name="icon" id="chess" />
               <img class="responsive-img circle" src="assets/images/chess.jpg">
             </label>
           </div>
           <div class="col s4 m2">
             <label>
-              <input type="radio" name="icon" val="dog" />
+              <input type="radio" name="icon" id="dog" />
               <img class="responsive-img circle" src="assets/images/dog.jpg">
             </label>
           </div>
           <div class="col s4 m2">
             <label>
-              <input type="radio" name="icon" val="fish" />
+              <input type="radio" name="icon" id="fish" />
               <img class="responsive-img circle" src="assets/images/fish.jpg">
             </label>
           </div>
@@ -248,19 +251,19 @@ $(document).on("submit", "#create-new", function (e) {
   email = $("#email").val().trim();
   password = $("#password").val().trim();
   displayName = $("#name").val().trim();
-  photoURL = "assets/images/" + $("input[name=icon]:checked").val() + ".jpg";
-
+  photoURL = "assets/images/" + $("input[name=icon]:checked").attr("id") + ".jpg";
   firebase.auth().createUserWithEmailAndPassword(email, password)
-  // .then(function(user){
-  //   console.log("new user:", user);
-  //   console.log("current user before", firebase.auth().currentUser);
-  //   firebase.auth().currentUser.updateProfile({
-  //     displayName: displayName,
-  //     photoURL: photoURL
-  //   });
-  //   console.log("current user after", firebase.auth().currentUser);
-  //   // assignUser(firebase.auth().currentUser);
-  // })
+  .then(function(user){
+    console.log("new user:", user);
+    console.log("firebase.auth().currentUser", firebase.auth().currentUser);
+    firebase.auth().currentUser.updateProfile({
+      displayName: displayName,
+      photoURL: photoURL
+    });
+    console.log("current user after", firebase.auth().currentUser);
+    // TODO: remove this alert when the problem is solved
+    alert("Due to a bug I haven't solved, your name and picture will display as null. Refresh the page and they will work.");
+  })
   .catch(handleAuthError);
 });
 
@@ -299,7 +302,7 @@ $(document).ready(function(){
 function glowOrange(target, string) {
   console.log(string);
   var newDiv = $("<p class='glow-orange flow-text'>");
-  newDiv.text(string);
+  newDiv.html(string);
   target.append(newDiv);
   target.scrollTop(target.height()); // scroll to bottom
   // use CSS transitions to bring an orange text-shadow in and out

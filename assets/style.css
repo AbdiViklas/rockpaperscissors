@@ -86,3 +86,9 @@ label > input:checked + img{ /* (RADIO CHECKED) IMAGE STYLES */
   -ms-transition:text-shadow .75s;
   transition:text-shadow .75s;
 }
+
+/* TODO: tweak alignment relative to text */
+.user-pic {
+  height: 1.5em;
+  margin: 0 5px;
+}
