@@ -14,34 +14,13 @@ firebase.initializeApp(config);
 
 var database = firebase.database();
 
-var displayName, email, password, photoURL;
+var displayName, email, password, photoURL, playerNum;
 
 // To hold user's display information
 var currentUser = {
   displayName: "",
   photoURL: ""
 }
-// increment to 1 or 2 on player connect
-var playersPresent = 0;
-
-// TODO: delete. just here to help me visualize the needed properties
-var sampleUser = {
-  displayName: "foo",
-  photoURL: "",
-  conected: false, //?
-  choice: "",
-  totalWins: 0,
-  totalLosses: 0
-}
-
-// How to handle chat history:
-// Make it a property of the user object?
-// Or its own (top-level) object, maybe an array (for ordering) full of objects, each with only one key-value pair ({userName: "message"})?
-// the latter.
-
-// What happens on logout? Chat history persists for still-connected user. If a new player2 comes along, though, they shouldn't see history.
-// and maybe at that point it's reset for player1 as well?
-// on "new game" between both existing players, though, chat should persist
 
 // USER AUTH
 
@@ -54,11 +33,16 @@ $('.modal').modal({
 var initialModalContent = $("#splashModal").html();
 
 // success and error handlers for after sign in
-function assignUser() {
+function logInOut() {
   var user = firebase.auth().currentUser;
-    console.log("assignUser received:", user); // the object logged here has displayName set correctly
+    console.log("logInOut received:", user); // the object logged here has displayName set correctly
   if (user) {
     // User is signed in
+    // check whether user is first player to arrive or second
+    // if first, set players.player1 to user.displayName
+    // and glowOrange "waiting for player 2"
+    // else set to player2 and glowOrange "(player1) is waiting for you"
+
     $("#splashModal").modal('close');
     currentUser.displayName = user.displayName;
     // the two lines below log null
@@ -72,6 +56,19 @@ function assignUser() {
     // var providerData = user.providerData;
     $("#messages").empty();
     glowOrange($("#messages"), `<img src="${currentUser.photoURL}" class="user-pic img-responsive circle">Welcome ${currentUser.displayName}!`);
+
+    database.ref("players").once("value").then(function(snapshot){
+      var currentVal = snapshot.val();
+      // If you're the first one here...
+      if (currentVal.player1 === "") {
+        database.ref("players/player1").set(currentUser.displayName);
+        playerNum = "player1";
+      } else if (currentVal.player2 === "") { // if you're the second one here...
+        database.ref("players/player2").set(currentUser.displayName);
+        playerNum = "player2";
+      }
+    });
+
   } else if (!user) {
     // User is signed out.
     console.log("no user");
@@ -80,6 +77,8 @@ function assignUser() {
     $('#splashModal').modal('open');
   }
 }
+
+
 
 function handleAuthError(error) {
   var errorCode = error.code;
@@ -109,7 +108,7 @@ $(document).on("click", "#google-auth", function (e) {
   firebase.auth().signInWithRedirect(provider);
   // handle what happens when they get back
   firebase.auth().getRedirectResult()
-  // .then(assignUser)
+  // .then(logInOut)
   .catch(handleAuthError);
 });
 
@@ -156,7 +155,6 @@ $(document).on("submit", "#signIn", function (e) {
   password = $("#password").val();
   // TODO: create success promise
   firebase.auth().signInWithEmailAndPassword(email, password)
-  // .then(assignUser)
   .catch(handleAuthError);
 });
 
@@ -268,15 +266,19 @@ $(document).on("submit", "#create-new", function (e) {
 });
 
 
-firebase.auth().onAuthStateChanged(assignUser);
+firebase.auth().onAuthStateChanged(logInOut);
 
 // 
 $(document).on("click", "#sign-out", function (e) {
   e.preventDefault();
-  firebase.auth().signOut().then(function() {
-    // Sign-out successful.
-  }).catch(function(error) {
-    // An error happened.
+  // return firebase player designation to empty string (you can't have a key with no value) and local var playerNum to undefined
+  database.ref("players/" + playerNum).set("").then(function(){
+    playerNum = undefined;
+    firebase.auth().signOut().then(function() {
+      // Sign-out successful.
+    }).catch(function(error) {
+      // An error happened.
+    });
   });
 });
 
