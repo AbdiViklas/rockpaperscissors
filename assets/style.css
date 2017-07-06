@@ -58,13 +58,16 @@ label > input:checked + img{ /* (RADIO CHECKED) IMAGE STYLES */
 }
 
 #messages {
-  min-height: 20vh;
+  height: 20vh;
+  overflow-y: auto;
 }
 
 .gray-box {
   border: 5px solid #9e9e9e;
   border-radius: 10px;
 }
+
+/* TODO: create gradient opacity fade effect at top of #messages */
 
 .glow-orange {
   -webkit-transition:text-shadow 3s;
