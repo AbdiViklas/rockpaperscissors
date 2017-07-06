@@ -43,21 +43,23 @@
 <!--the three big rock, paper, scissors buttons-->
   <div class="row">
     <div class="col s4">
-      <div id="rock" class="card-panel gray-box hand-box orange-text hoverable">
+      <div id="rock" class="card-panel gray-box hand-box orange-text hoverable tooltipped" data-tooltip="ROCK">
         <i class="fa fa-hand-rock-o"></i>
       </div>
     </div>
     <div class="col s4">
-      <div id="paper" class="card-panel gray-box hand-box orange-text hoverable">
+      <div id="paper" class="card-panel gray-box hand-box orange-text hoverable tooltipped" data-tooltip="PAPER">
         <i class="fa fa-hand-paper-o"></i>
       </div>
     </div>
     <div class="col s4">
-      <div id="scissors" class="card-panel gray-box hand-box orange-text hoverable">
+      <div id="scissors" class="card-panel gray-box hand-box orange-text hoverable tooltipped" data-tooltip="SCISSORS">
         <i class="fa fa-hand-scissors-o"></i>
       </div>
     </div>
   </div>
+
+  <a id="submit" class="btn-large waves-effect orange accent-3"><i class="fa fa-check-square-o" aria-hidden="true"></i>submit choice</a>
 
   <!--modal, open on load, offering choices of create, sign in, or use Google-->
   <div id="splashModal" class="modal">

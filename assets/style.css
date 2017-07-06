@@ -104,7 +104,18 @@ label > input:checked + img{ /* (RADIO CHECKED) IMAGE STYLES */
   background-color: #eee;
 }
 
+/*styles tooltips*/
+.backdrop {
+  background-color: rgba(66, 66, 66, 0.8)
+}
+
 .choice {
   color: white !important;
   background-color: #ff9100 !important;
+}
+
+#submit {
+  display: block;
+  width: 50%;
+  margin: auto;
 }

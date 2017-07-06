@@ -40,14 +40,9 @@ function logInOut() {
     console.log("logInOut received:", user); // the object logged here has displayName set correctly
   if (user) {
     // User is signed in
-    // check whether user is first player to arrive or second
-    // if first, set players.player1 to user.displayName
-    // and glowOrange "waiting for player 2"
-    // else set to player2 and glowOrange "(player1) is waiting for you"
-
     $("#splashModal").modal('close');
     currentUser.displayName = user.displayName;
-    // the two lines below log null
+    // BUG: the two lines below log null on first time createUser
     console.log("user.displayName:", user.displayName);
     console.log("currentUser.displayName", currentUser.displayName);
     currentUser.email = user.email;
@@ -82,6 +77,7 @@ function logInOut() {
         glowOrange($("#messages"), `Sorry, ${players.player1} is playing ${players.player2} right now. Wait for one of them to sign out.`)
       }
     });
+    // TODO: fix the fact that if one player reloads the page they are now playing themself
   } else if (!user) {
     // User is signed out.
     console.log("no user");
@@ -293,7 +289,7 @@ $(document).on("submit", "#create-new", function (e) {
 
 firebase.auth().onAuthStateChanged(logInOut);
 
-// 
+
 $(document).on("click", "#sign-out", function (e) {
   e.preventDefault();
   // first, negate signedIn so the child_added listener on the database "players" node can distinguish between this signout and the initial absence of users
@@ -305,6 +301,7 @@ $(document).on("click", "#sign-out", function (e) {
       // Sign-out successful.
     }).catch(function(error) {
       // An error happened.
+      console.log(error);
     });
   });
 });
@@ -345,6 +342,9 @@ function glowOrange(target, string) {
 
 // GAMEPLAY
 
+// TODO: handle player turn order, prompt players
+
+// select only one RPS button at a time (like radio buttons)
 $(".hand-box").click(function (e) { 
   e.preventDefault();
   $(".hand-box").not($(this)).removeClass("choice");
