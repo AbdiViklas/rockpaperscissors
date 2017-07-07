@@ -350,3 +350,25 @@ $(".hand-box").click(function (e) {
   $(".hand-box").not($(this)).removeClass("choice");
   $(this).addClass("choice");
 });
+
+$("#submit").click(function (e) { 
+  e.preventDefault();
+  if ($(".choice").length) {
+    choice = $(".choice").attr("id");
+    database.ref("choices/" + playerNum).set(choice);
+  } else {
+    Materialize.toast("You gotta choose one first!");
+  }
+});
+
+/*
+That's as far as I've gotten by deadline. 
+Next steps would be to handle turn taking (and update players on whose turn it is) 
+and the actual logic of the rock-paper-scissors gameplay.
+Obviously I didn't even begin to address the chat system,but that would be another
+.gray-box like #messages, with content scrolling off the top and scroll focusing at 
+the bottom with every message. A method like glowOrange() could append chat messages, 
+but with two different colors for the different players (maybe aligned left and right
+as well like iMessage).
+Obviously there are a few bugs to fix too!
+*/
